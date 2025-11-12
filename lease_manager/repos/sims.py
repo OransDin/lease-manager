@@ -1,4 +1,4 @@
-from ..db import get_conn
+from lease_manager.db import get_conn
 
 def load_sims(unit_id):
     with get_conn() as con, con.cursor() as cur:

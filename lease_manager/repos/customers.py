@@ -1,3 +1,4 @@
+from lease_manager.db import get_conn
 
 def load_customers():
     with get_conn() as con, con.cursor() as cur:

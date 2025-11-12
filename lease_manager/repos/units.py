@@ -1,4 +1,4 @@
-from ..db import get_conn
+from lease_manager.db import get_conn
 
 def load_units(sn_filter=None, customer_id=None):
     sql = """

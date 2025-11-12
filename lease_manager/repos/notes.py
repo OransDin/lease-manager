@@ -1,4 +1,32 @@
-import os
+from lease_manager.db import get_conn
 
-DB_URL = os.getenv("DATABASE_URL", "postgresql://lease:leasepass@db:5432/lease")
-APP_TITLE = "📦 Lease Manager"
+def add_note(unit_id, note, author):
+    with get_conn() as con, con.cursor() as cur:
+        cur.execute(
+            "INSERT INTO unit_notes(unit_id, note_text, author) VALUES (%s,%s,%s)",
+            (unit_id, note, author),
+        )
+        con.commit()
+
+def get_notes(unit_id):
+    with get_conn() as con, con.cursor() as cur:
+        cur.execute("""
+            SELECT id, note_text, COALESCE(author,'' ) AS author, created_at
+            FROM unit_notes
+            WHERE unit_id=%s
+            ORDER BY created_at DESC
+        """, (unit_id,))
+        return cur.fetchall()
+
+def delete_note(note_id):
+    with get_conn() as con, con.cursor() as cur:
+        cur.execute("DELETE FROM unit_notes WHERE id=%s", (note_id,))
+        con.commit()
+
+def update_note(note_id, new_text):
+    with get_conn() as con, con.cursor() as cur:
+        cur.execute(
+            "UPDATE unit_notes SET note_text=%s, created_at=now() WHERE id=%s",
+            (new_text, note_id),
+        )
+        con.commit()
