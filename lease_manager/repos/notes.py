@@ -18,15 +18,19 @@ def get_notes(unit_id):
         """, (unit_id,))
         return cur.fetchall()
 
-def delete_note(note_id):
+def delete_note(note_id: int) -> bool:
     with get_conn() as con, con.cursor() as cur:
-        cur.execute("DELETE FROM unit_notes WHERE id=%s", (note_id,))
+        cur.execute("DELETE FROM unit_notes WHERE id=%s RETURNING id", (note_id,))
+        deleted = cur.fetchone()
         con.commit()
+        return bool(deleted)
 
-def update_note(note_id, new_text):
+def update_note(note_id: int, new_text: str) -> bool:
     with get_conn() as con, con.cursor() as cur:
         cur.execute(
-            "UPDATE unit_notes SET note_text=%s, created_at=now() WHERE id=%s",
+            "UPDATE unit_notes SET note_text=%s, created_at=now() WHERE id=%s RETURNING id",
             (new_text, note_id),
         )
+        updated = cur.fetchone()
         con.commit()
+        return bool(updated)

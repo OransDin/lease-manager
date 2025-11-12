@@ -7,6 +7,15 @@ from lease_manager.repos.notes import get_notes, update_note, delete_note
 from lease_manager.repos.leases import extend_lease
 
 st.title("🔎 Search")
+if "__last_search__" in st.session_state and not st.session_state.get("__consumed__", False):
+    remembered = st.session_state["__last_search__"]
+    customer_id = remembered.get("cust_id")
+    sn_q = remembered.get("sn")
+    trigger = True
+    st.session_state["__consumed__"] = True
+else:
+    st.session_state["__consumed__"] = False
+
 
 c1, c2, c3 = st.columns([1,1,1])
 with c1:
@@ -56,9 +65,21 @@ if trigger:
                     st.caption(f"by {n['author'] or 'unknown'} at {n['created_at']}")
                 with col2:
                     if st.button("Save", key=f"save_note_{n['id']}"):
-                        update_note(n["id"], new_txt.strip())
-                        st.success("Note updated.")
+                        ok = update_note(n["id"], new_txt.strip())
+                        if ok:
+                            st.success(f"Note #{n['id']} updated.")
+                        else:
+                            st.error("Update failed (note not found).")
+                        # נשמור את פרטי החיפוש ונעשה ריענון
+                        st.session_state["__last_search__"] = {"cust_id": customer_id, "sn": sn_q}
+                        st.rerun()
+
                 with col3:
                     if st.button("Delete", key=f"delete_note_{n['id']}"):
-                        delete_note(n["id"])
-                        st.warning("Note deleted.")
+                        ok = delete_note(n["id"])
+                        if ok:
+                            st.success(f"Note #{n['id']} deleted.")
+                        else:
+                            st.error("Delete failed (note not found).")
+                        st.session_state["__last_search__"] = {"cust_id": customer_id, "sn": sn_q}
+                        st.rerun()
