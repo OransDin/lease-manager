@@ -70,7 +70,6 @@ if trigger:
                             st.success(f"Note #{n['id']} updated.")
                         else:
                             st.error("Update failed (note not found).")
-                        # נשמור את פרטי החיפוש ונעשה ריענון
                         st.session_state["__last_search__"] = {"cust_id": customer_id, "sn": sn_q}
                         st.rerun()
 

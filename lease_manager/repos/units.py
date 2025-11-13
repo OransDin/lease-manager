@@ -13,7 +13,6 @@ def load_units(sn_filter=None, customer_id=None):
     params = []
     if sn_filter:
         like = "%" + sn_filter + "%"
-        # אם זה בדיוק 5 ספרות – חפש כסיומת
         if len(sn_filter) == 5 and sn_filter.isdigit():
             like = "%" + sn_filter
         sql += " AND u.sn LIKE %s"
